@@ -11,10 +11,8 @@ export let timestamp = ()=>{
     return{timestamp}
 }
 
-export const createHash = password =>{
-    bcrypt.hashSync(password,bcrypt.genSaltSync(10));
-}
+export const createHash = password => bcrypt.hashSync(password,bcrypt.genSaltSync(10))
 
-export const isValidPassword = (usuario,password) => bcrypt.compareSync(password,usuario.password);
+export const isValidPassword = (user,password) => bcrypt.compareSync(password,user.password);
 
 export default __dirname;

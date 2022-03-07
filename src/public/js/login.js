@@ -6,7 +6,7 @@ submitBtn.addEventListener('click',(event)=>{
     let sendObject = {}
     let data = new FormData(form)
     data.forEach((value,key)=>sendObject[key]=value)
-    fetch('/api/login',{
+    fetch('/session/login',{
         method:"POST",
         body:JSON.stringify(sendObject),
         headers:{
@@ -14,6 +14,6 @@ submitBtn.addEventListener('click',(event)=>{
         }
     }).then(result=>result.json()).then(json=>{
         console.log(json)
-        location.replace('./pages/page.html')
+        location.replace('./page.html')
     });
 })

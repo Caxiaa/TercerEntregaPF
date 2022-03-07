@@ -1,36 +1,38 @@
 import express from 'express';
-import {productos} from '../daos/index.js';
+import {productService} from '../services/services.js';
 const router = express.Router();
 
 //GETS
 router.get('/',(req,res)=>{
-    productos.getAll().then(result=>{
-        res.send(result);   
+    productService.getAll().then(result=>{
+        let renderObj ={
+            products:result,
+        }
+        res.render('Home',renderObj)
     })
 })
 
 router.get('/:uid',(req,res)=>{
     let id = req.params.uid;
-   productos.getById(id).then(result=>{
+    productService.getBy(id).then(result=>{
         console.log(result);
         res.send(result);
     })
 })
 //POSTS
 router.post('/',(req,res)=>{
-    let producto = req.body;
-    if(req.auth)
-    productos.save(producto).then(result=>{
-        res.send(result);
+    let product = req.body;
+    productService.save(product).then(result=>{
+        res.send({message:"Loaded product!", payload:result});
     })
 })
 
 //PUTS
 router.put('/:uid',(req,res)=>{
     let id = req.params.uid;
-    let producto = req.body;
+    let product = req.body;
     if(req.auth)
-    productos.editarProducto(id, producto).then(result=>{
+    productService.update(id, product).then(result=>{
         res.send(result);
     })
 })
@@ -38,8 +40,7 @@ router.put('/:uid',(req,res)=>{
 //DELETES 
 router.delete('/:uid',(req,res)=>{
     let id = req.params.uid;
-    if(req.auth)
-    productos.deleteById(id).then(result=>{
+    productService.delete(id).then(result=>{
         res.send(result);
     })
 })

@@ -1,55 +1,64 @@
+import config from './config.js';
 import passport from 'passport';
 import local from 'passport-local';
-import {user} from './daos/index.js';
-import { createHash } from './utiles.js';
-import { isValidPassword } from './utiles.js';
+import { userService } from './services/services.js';
+import { createHash,isValidPassword } from './utiles.js';
 
 const LocalStrategy = local.Strategy;
 
-export const initializePassport = () =>{
+const initializePassport = () =>{
     passport.use('register', new LocalStrategy({
         usernameField:"email",
         passwordField:"password",
-        passReqToCallback:true
+        passReqToCallback:true,
+        session:false
     },async(req,email,password,done)=>{
+        let {name,age,address,phone} = req.body;
         try {
-            let usuario = await user.findOne({email:email});
-            if(usuario) return done(null,false);
+            let user = await userService.getBy({email:email});
+            if(user) return done(null,false,{message:"User already exists!"});
             const newUser = {
-                email:email,
-                name:req.body.name,
-                age:re.body.age,
-                address:req.body.address,
-                phone:req.body.phone,
-                password:createHash(password)
+                email,
+                name,
+                age,
+                address,
+                phone,
+                password:createHash(password),
+                avatar: req.file.path,
+                cart:[],
+                role:"user"
             }
-            console.log(newUser);
-            try {
-                let result = await user.save(newUser);
-                return done(null,result);
-            } catch (error) {
-                return done(error);
-            }
+            let result = await userService.save(newUser);
+
+            return done(null,result);
         } catch (error) {
+            console.log(error);
             return done(error);
         }
     }))
-    passport.use('login',new LocalStrategy(async(email,password,done)=>{
+    passport.use('login',new LocalStrategy({usernameField:"email"},async(username,password,done)=>{
         try {
-            let usuario = await user.findOne({email:email});
-            if(!usuario) return done(null,false,{message:"Account doesnt exist"});
-            if(!isValidPassword(usuario,password)) return done(null,false,{message:"Invalid password"});
-            console.log("LOGUEADO");
-            return done(null,usuario);
+            if(username===config.session.ADMIN||password===config.session.PASSWORD){
+                return done(null,{id:0,role:"admin"})
+            }
+            const user = await userService.getBy({email:username});
+            if(!user) return done(null,false,{message:"Email not found"});
+            if(!isValidPassword(user,password)) return done(null,false,{message:"Incorrect password!"});
+            return done(null,user)
         } catch (error) {
+            console.log(error);
             return done(error);
         }
     }))
 
     passport.serializeUser((user,done)=>{
-        done(null,user._id)
+        done(null,user._id);
     })
-    passport.deserializeUser((id,done)=>{
-        user.findById(id);
+    passport.deserializeUser(async(id,done)=>{
+        let result = await userService.getBy({_id:id})
+        done(null,result);
     })
+
 }
+
+export default initializePassport;

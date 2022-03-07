@@ -4,5 +4,9 @@ dotenv.config();
 export default{
     mongo:{
         url: process.env.MONGO_URL
+    },
+    session:{
+        ADMIN:process.env.ADMIN,
+        PASSWORD:process.env.PASSWORD
     }
 }

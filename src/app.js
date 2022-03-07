@@ -7,8 +7,9 @@ import {Server} from 'socket.io';
 import __dirname from './utiles.js';
 import session from 'express-session';
 import MongoStore from 'connect-mongo'
-import { initializePassport } from './passport-config.js';
+import  initializePassport from './passport-config.js';
 import passport from 'passport';
+import sessionRouter from './routes/session.js';
 
 const app = express();
 const PORT = process.env.PORT||8080;
@@ -39,19 +40,4 @@ app.use(express.static(__dirname+'/public'));
 
 app.use('/api/productos',productosRouter);
 app.use('/api/carrito',carritoRouter);
-
-app.post('/api/register',passport.authenticate('register',{failureRedirect:'/failedRegister'}),(req,res)=>{
-    res.send({messages:"Signed up"})
-})
-
-app.post('/api/login',passport.authenticate('login',{failureRedirect:'/failedLogin'}),(req,res)=>{
-    res.send({messages:"Logued!"})
-})
-
-app.get('/failedRegsiter',(req,res)=>{
-    res.send("ERROR AL REGISTRARSE")
-})
-
-app.get('/failedLogin',(req,res)=>{
-    res.send("ERROR AL LOGUEARSE")
-})
+app.use('/session',sessionRouter);

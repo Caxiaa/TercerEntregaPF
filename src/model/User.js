@@ -10,17 +10,17 @@ export default class User{
     }
     static get schema(){
         return{
-            email:{type:String,required:true},
-            name:{type:String,required:true},
-            age:{type:Number,required:true},
-            address:{type:String,required:true},
-            phone:{type:Number,required:true},
-            password:{type:String,required:true},
+            email:{type:String},
+            name:{type:String},
+            age:{type:Number},
+            address:{type:String},
+            phone:{type:Number},
+            password:{type:String},
+            avatar:{type:String},
             cart:[{
                 type:Boolean,
                 default:true
-            }],
-            profile_picture:String
+            }]
         }
     }
 }
