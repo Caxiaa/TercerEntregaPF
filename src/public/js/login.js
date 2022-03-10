@@ -12,8 +12,12 @@ submitBtn.addEventListener('click',(event)=>{
         headers:{
             'Content-Type':"application/json"
         }
-    }).then(result=>result.json()).then(json=>{
-        console.log(json)
-        location.replace('./page.html')
+    }).then(result=>{
+        if(result.status===404){
+            return window.alert('User or Password not valid')
+         }
+         else{
+             location.replace('/session/profile')
+         }
     });
 })

@@ -10,6 +10,12 @@ import MongoStore from 'connect-mongo'
 import  initializePassport from './passport-config.js';
 import passport from 'passport';
 import sessionRouter from './routes/session.js';
+import userRouter from './routes/users.js';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import config from './config.js'
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT||8080;
@@ -23,11 +29,12 @@ export const io = new Server(server);
 app.engine('handlebars',engine())
 app.set('views',__dirname+'/views')
 app.set('view engine','handlebars')
+
 app.use(session({
-    store:MongoStore.create({mongoUrl:"mongodb+srv://santi451:123@cluster0.hzxzy.mongodb.net/sessions?retryWrites=true&w=majority"}),
-    secret:"eccomercecoder",
+    store:MongoStore.create({mongoUrl:config.mongo.sessionUrl}),
+    secret:process.env.SESSION_SECRET,
     resave:false,
-    saveUninitialized:false
+    saveUninitialized:true
 }))
 initializePassport();
 app.use(passport.initialize());
@@ -37,7 +44,9 @@ app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({extended:true}));
 app.use(express.static(__dirname+'/public'));
+app.use(cookieParser());
 
 app.use('/api/productos',productosRouter);
 app.use('/api/carrito',carritoRouter);
 app.use('/session',sessionRouter);
+app.use('/user',userRouter)
