@@ -1,13 +1,13 @@
 import express from 'express';
 import { passportCall } from '../utils/middlewares.js';
-import { uploader } from '../services/uploader.js'
+import upload from '../services/uploader.js'
 import dotenv from 'dotenv';
 import sessionController from '../controllers/sessionController.js';
 
 dotenv.config();
 const router = express.Router();
 
-router.post('/register',uploader.single('avatar'),passportCall('register'),sessionController.register)
+router.post('/register',upload.single('profilePic'),passportCall('register'),sessionController.register)
 
 router.post('/login',passportCall('login'),sessionController.login);
 

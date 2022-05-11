@@ -29,7 +29,7 @@ const initializePassport = () =>{
                 email,
                 phone,
                 cart:[],
-                profile_picture: req.file.filename
+                profile_picture: req.protocol+"://"+req.hostname+":8080"+'/images/'+req.file.filename
             }
             let result = await userService.save(newUser);
 

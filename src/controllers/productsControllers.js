@@ -15,7 +15,7 @@ const getProducts = async(req,res)=>{
 const getOneProduct = async(req,res)=>{
     try {
         let id = req.params.uid;
-        productService.getBy(id).then(result=>{
+        productService.getBy({_id:id}).then(result=>{
             console.log(result);
             res.send({status:"success",payload:result});
         })

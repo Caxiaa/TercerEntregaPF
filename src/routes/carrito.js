@@ -1,5 +1,4 @@
 import express from 'express';
-import {cartService} from '../services/services.js';
 import cartControllers from '../controllers/cartControllers.js';
 const router = express.Router();
 
@@ -8,10 +7,12 @@ router.get('/:uid',cartControllers.getCart);
 
 //POSTS
 router.post('/',cartControllers.generateCart);
-router.post('/:uid',cartControllers.addProductCart);
+router.post('/:cid/products/:pid',cartControllers.addProductCart);
+router.post('/purchase/:cid',cartControllers.confirmPurchase);
 
+//PUTS
+router.put('/:cid',cartControllers.updateCart);
 //DELETES
-router.delete('/:uid/:id_prod',cartControllers.deleteProductCart);
-router.delete('/:uid',cartControllers.deleteCart);
+router.delete('/:cid/products/:pid',cartControllers.deleteProductCart);
 
 export default router;

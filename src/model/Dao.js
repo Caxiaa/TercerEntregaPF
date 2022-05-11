@@ -3,6 +3,7 @@ import User from './User.js';
 import Product from './Product.js';
 import Cart from './Cart.js'
 import logger from '../utils/logger.js';
+import Messages from './Message.js';
 
 export default class Dao{
     constructor(config){
@@ -10,15 +11,27 @@ export default class Dao{
             console.log(error);
             process.exit();
         })
+        const populateProducts = function(next){
+            this.populate('products.product');
+            next();
+        }
+        const populateMessages = function(next){
+            this.populate('author');
+            next();
+        }
         const timestamp = {timestamps:{createdAt:'created_at',updateAt:'updated_at'}}
         const userSchema = mongoose.Schema(User.schema,timestamp);
         const productSchema = mongoose.Schema(Product.schema,timestamp);
         const cartSchema = mongoose.Schema(Cart.schema,timestamp);
+        cartSchema.pre('findOne',populateProducts);
+        const messageSchema = mongoose.Schema(Messages.schema,timestamp);
+        messageSchema.pre('find',populateMessages);
         
         this.models={
             [User.model]:mongoose.model(User.model,userSchema),
             [Product.model]:mongoose.model(Product.model,productSchema),
-            [Cart.model]:mongoose.model(Cart.model,cartSchema)
+            [Cart.model]:mongoose.model(Cart.model,cartSchema),
+            [Messages.model]:mongoose.model(Messages.model,messageSchema)
         }
     }
     findOne = async(options,entity)=>{
