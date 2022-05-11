@@ -11,6 +11,7 @@ export default{
         PASSWORD:process.env.PASSWORD
     },
     jwt:{
-        SECRET:process.env.SECRET_JWT
+        SECRET:process.env.SECRET_JWT,
+        COOKIE_NAME:process.env.COOKIE_NAME
     }
 }

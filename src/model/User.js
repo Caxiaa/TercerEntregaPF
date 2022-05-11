@@ -10,17 +10,23 @@ export default class User{
     }
     static get schema(){
         return{
-            email:{type:String},
-            name:{type:String},
-            age:{type:Number},
-            address:{type:String},
-            phone:{type:Number},
+            first_name:{type:String},
+            last_name:{type:String},
             password:{type:String},
-            avatar:{type:String},
-            cart:[{
+            role:{type:String},
+            email:{type:String},
+            status:{
                 type:Boolean,
                 default:true
-            }]
+            },
+            phone:{type:String},
+            cart:{
+                type:[{
+                    type: Schema.Types.ObjectId,
+                    ref:'Carts'
+                }]
+            },
+            profile_picture:String
         }
     }
 }

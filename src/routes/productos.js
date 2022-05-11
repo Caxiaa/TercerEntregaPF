@@ -1,49 +1,21 @@
 import express from 'express';
 import {productService} from '../services/services.js';
+import productController from '../controllers/productsControllers.js';
+
 const router = express.Router();
 
 //GETS
-router.get('/',(req,res)=>{
-    productService.getAll().then(result=>{
-        let renderObj ={
-            products:result,
-        }
-        res.render('Home',renderObj)
-    })
-})
+router.get('/',productController.getProducts);
+router.get('/:uid',productController.getOneProduct);
 
-router.get('/:uid',(req,res)=>{
-    let id = req.params.uid;
-    productService.getBy(id).then(result=>{
-        console.log(result);
-        res.send(result);
-    })
-})
 //POSTS
-router.post('/',(req,res)=>{
-    let product = req.body;
-    productService.save(product).then(result=>{
-        res.send({message:"Loaded product!", payload:result});
-    })
-})
+router.post('/',productController.addProduct);
 
 //PUTS
-router.put('/:uid',(req,res)=>{
-    let id = req.params.uid;
-    let product = req.body;
-    if(req.auth)
-    productService.update(id, product).then(result=>{
-        res.send(result);
-    })
-})
+router.put('/:uid',productController.editProduct);
 
 //DELETES 
-router.delete('/:uid',(req,res)=>{
-    let id = req.params.uid;
-    productService.delete(id).then(result=>{
-        res.send(result);
-    })
-})
+router.delete('/:uid',productController.deleteProduct);
 
 
 export default router;

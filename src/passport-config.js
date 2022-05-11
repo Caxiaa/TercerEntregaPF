@@ -17,20 +17,19 @@ const initializePassport = () =>{
         passReqToCallback:true,
         session:false
     },async(req,email,password,done)=>{
-        let {name,age,address,phone} = req.body;
+        let {first_name,last_name,phone} = req.body;
         try {
             let user = await userService.getBy({email:email});
             if(user) return done(null,false,{message:"User already exists!"});
             const newUser = {
-                email,
-                name,
-                age,
-                address,
-                phone,
+                first_name,
+                last_name,
                 password:createHash(password),
-                avatar: req.file.path,
+                role:"user",
+                email,
+                phone,
                 cart:[],
-                role:"user"
+                profile_picture: req.file.filename
             }
             let result = await userService.save(newUser);
 
@@ -59,6 +58,7 @@ const initializePassport = () =>{
         secretOrKey:config.jwt.SECRET},
         async(jwt_payload,done)=>{
             try{
+                if(jwt_payload.role==='superadmin') return done(null, jwt_payload);
                 let user = await userService.getBy({_id:jwt_payload._id});
                 if(!user) return done(null,false,{message:'User not found'})
                 return done(null,user)
