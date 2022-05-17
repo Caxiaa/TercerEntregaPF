@@ -13,6 +13,7 @@ import sessionRouter from './routes/session.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import config from './config.js'
+import { messageService } from './services/services.js';
 
 dotenv.config();
 
@@ -22,7 +23,12 @@ const server = app.listen(PORT,()=>{
     console.log("servidor escuchando en: "+PORT);
 })
 
-export const io = new Server(server);
+export const io = new Server(server,{
+    cors:{
+        origin: 'http://localhost:3000',
+        methods:['GET','POST']
+    }
+});
 
 
 app.engine('handlebars',engine())
@@ -48,3 +54,45 @@ app.use(cookieParser());
 app.use('/api/products',productosRouter);
 app.use('/api/carts',carritoRouter);
 app.use('/api/session',sessionRouter);
+
+let connectedSockets = {};
+
+io.on('connection',async socket=>{
+    console.log("client connected");
+    if(socket.handshake.query.name){
+        if(Object.values(connectedSockets).some(user=>user.id===socket.handshake.query.id)){
+            Object.keys(connectedSockets).forEach(idSocket =>{
+                if(connectedSockets[idSocket].id===socket.handshake.query.id){
+                    delete connectedSockets[idSocket];
+                    connectedSockets[socket.id]={
+                        name: socket.handshake.query.name,
+                        id:socket.handshake.query.id,
+                        thumbnail:socket.handshake.query.thumbnail
+                    };
+                }
+            })
+        }else{
+            connectedSockets[socket.id]={
+                name:socket.handshake.query.name,
+                id:socket.handshake.query.id,
+                thumbnail:socket.handshake.query.thumbnail
+            };
+        }
+    }
+    io.emit('users',connectedSockets);
+    let logs =await messageService.getAll();
+    io.emit('logs',logs);
+    socket.on('disconnect',reason=>{
+        delete connectedSockets[socket.id];
+    })
+    socket.on('message',async data=>{
+        if(Object.keys(connectedSockets).includes(socket.id)){
+            await messageService.save({
+                author:connectedSockets[socket.id].id,
+                content:data
+            })
+            let logs = await messageService.getAll();
+            io.emit('logs',logs);
+        }
+    })
+})

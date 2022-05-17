@@ -39,7 +39,6 @@ const login = async(req,res)=>{
     let user;
     if(req.user.role!=='superadmin'){
         user = req.user;
-        console.log(user);
     }else{
         user = req.user;    
     }
